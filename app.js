@@ -15,6 +15,20 @@ const countOccurrencesLinearSearch = (x, a) => {
     return count;
 };
 
+const countOccurrencesLinearSearchTestDrive = () => {
+    let a = [1, 1, 2, 4, 5, 5, 7, 9];
+    let x = 5;
+
+    let response = countOccurrencesLinearSearch(x, a);
+    console.log('Linear Search');
+    console.log('---');
+    console.log('Array: ', a);
+    console.log('Value: ', x);
+    console.log('Occurrences', response);
+    console.log();
+};
+countOccurrencesLinearSearchTestDrive();
+
 // Next, write a function that solves this problem by performing two binary searches.
 
 const countOccurrencesBinarySearch = (x, a) => {
@@ -69,61 +83,53 @@ const findLowerBound = (x, a, left, right) => {
     }
 };
 
+const countOccurrencesBinarySearchTestDrive = () => {
+    let a = [1, 1, 2, 4, 5, 5, 7, 9];
+    let x = 5;
+
+    let response = countOccurrencesBinarySearch(x, a);
+    console.log('Binary Search');
+    console.log('---');
+    console.log('Array: ', a);
+    console.log('Value: ', x);
+    console.log('Occurrences', response);
+    console.log();
+};
+countOccurrencesBinarySearchTestDrive();
+
 // Finally, benchmark your two functions for random sorted arrays of size 10, 100, ..., up to
-//10,000,000. How does performance compare between the two functions?
+// 10,000,000. How does performance compare between the two functions?
 
 const Benchmark = require('benchmark');
 
-const main = () => {
-    let a = [1, 1, 2, 4, 5, 5, 5, 7, 10, 10, 10, 10, 18, 18, 19, 320];
-    let x = 18;
+const benchmarkFunctions = () => {
+    let arraySize = 10;
 
-    let random1kArray = Array.from({length: 1000}, () => Math.floor(Math.random() * 100));
-    random1kArray.sort(function(a, b) { return a-b });
-    let random1kX = Math.floor(Math.random() * 100);
+    while (arraySize <= 10000000) {
+        console.log(`Benchmark with array size ${arraySize}`);
+        let randomArray = Array.from({length: arraySize}, () => Math.floor(Math.random() * (Math.log2(arraySize) * 3)));
+        randomArray.sort((a, b) => { return a-b });
+        // possible values for the randomly generated array will range from 0 to the (log2 of the array size) * 3. E.g. array of length 10 can have from 0-9, length 100 can have 0-19, length 1000 can have 0-29 etc.
+        let randomX = Math.floor(Math.random() * (Math.log2(arraySize) * 3));
 
-    console.log(random1kArray);
-    console.log(random1kX);
+        var suite = new Benchmark.Suite;
 
-    // let occurrences = countOccurrences(x, a);
-    // console.log(occurrences);
+        suite.add('Linear Search', function() {
+            countOccurrencesLinearSearch(randomX, randomArray);
+        })
+        .add('Binary Search', function() {
+            countOccurrencesBinarySearch(randomX, randomArray);
+        })
+        .on('cycle', function(event) {
+          console.log(String(event.target));
+        })
+        .on('complete', function() {
+          console.log('Fastest is ' + this.filter('fastest').map('name'));
+        })
+        // run async
+        .run({ 'async': false });
 
-    // let lowIndex = findLowerBound(x, a, 0, a.length-1);
-    // console.log(lowIndex)
-
-    // let occurrences = countOccurrencesBinarySearch(x, a);
-    // console.log(occurrences);
-
-    // let linearBenchmark = new Benchmark('linear', function() {
-    //     countOccurrencesLinearSearch(x, a);
-    // });
-    //
-    // let binaryBenchmark = new Benchmark('binary', function() {
-    //     countOccurrencesBinarySearch(x, a);
-    // });
-    var suite = new Benchmark.Suite;
-
-    // add tests
-    suite.add('RegExp#test', function() {
-      /o/.test('Hello World!');
-    })
-    .add('String#indexOf', function() {
-      'Hello World!'.indexOf('o') > -1;
-    })
-    .add('linear1k', function() {
-        countOccurrencesLinearSearch(random1kX, random1kArray);
-    })
-    .add('binary1k', function() {
-        countOccurrencesBinarySearch(random1kX, random1kArray);
-    })
-    // add listeners
-    .on('cycle', function(event) {
-      console.log(String(event.target));
-    })
-    .on('complete', function() {
-      console.log('Fastest is ' + this.filter('fastest').map('name'));
-    })
-    // run async
-    .run({ 'async': true });
-};
-main();
+        arraySize *= 10; // multiplies arraySize by 10 before going into next iteration
+    }
+}
+benchmarkFunctions();
