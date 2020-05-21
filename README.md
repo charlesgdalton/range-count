@@ -2,6 +2,11 @@
 
 This is a Node.js program, so that's required to execute.
 
+Also, to get dependency run
+```
+$ npm install
+```
+
 To run, execute the following command in your terminal while in the range-count directory:
 ```
 $ node app.js
